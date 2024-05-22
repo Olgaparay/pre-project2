@@ -11,8 +11,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserDaoHibernateImpl implements UserDao {
+    private static final Logger logger = Logger.getLogger(UserDaoHibernateImpl.class.getName());
     private SessionFactory sessionFactory = Util.getSessionFactory();
 
     public UserDaoHibernateImpl() {
@@ -26,11 +29,9 @@ public class UserDaoHibernateImpl implements UserDao {
             Query query = session.createSQLQuery("CREATE TABLE if not exists user (Id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50), lastName VARCHAR(50), age INT)").addEntity(User.class);
             query.executeUpdate();
             transaction.commit();
-            System.out.println("создала таблицу");
+            logger.info("Таблица пользователей успешно создана.");
         } catch (Exception ex) {
-            System.out.println("111111111111");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при создании таблицы пользователей.", ex);
         }
     }
 
@@ -41,11 +42,9 @@ public class UserDaoHibernateImpl implements UserDao {
             Query query = session.createSQLQuery("drop TABLE if exists user").addEntity(User.class);
             query.executeUpdate();
             transaction.commit();
-            System.out.println("удаление таблицы");
+            logger.info("Таблица пользователей успешно удалена.");
         } catch (Exception ex) {
-            System.out.println("22222");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при удалении таблицы пользователей.", ex);
         }
     }
 
@@ -56,11 +55,9 @@ public class UserDaoHibernateImpl implements UserDao {
             User user = new User(name, lastName, age);
             session.save(user);
             transaction.commit();
-            System.out.println("добавили в таблицу поля user");
+            logger.info(String.format("Пользователь %s %s успешно сохранен.", name, lastName));
         } catch (Exception ex) {
-            System.out.println("3333333");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при сохранении пользователя.", ex);
         }
     }
 
@@ -71,11 +68,9 @@ public class UserDaoHibernateImpl implements UserDao {
             User user = new User();
             session.remove(user);
             transaction.commit();
-            System.out.println("удаление по id user определенного");
+            logger.info(String.format("Пользователь с id %d успешно удален.", id));
         } catch (Exception ex) {
-            System.out.println("44444");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при удалении пользователя по id.", ex);
         }
     }
 
@@ -84,11 +79,9 @@ public class UserDaoHibernateImpl implements UserDao {
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
             users = session.createQuery("from User", User.class).getResultList();
-            System.out.println("запрос на вывод данных в таблице user");
+            logger.info("Все пользователи успешно получены.");
         } catch (Exception ex) {
-            System.out.println("55555");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при получении всех пользователей.", ex);
         }
         return users;
     }
@@ -99,11 +92,9 @@ public class UserDaoHibernateImpl implements UserDao {
             session.beginTransaction();
             session.createQuery("DELETE User").executeUpdate();
             session.getTransaction().commit();
-            System.out.println("запрос на удаление полностью таблицы");
+            logger.info("Таблица пользователей успешно очищена.");
         } catch (Exception ex) {
-            System.out.println("6666");
-
-            System.out.println(ex);
+            logger.log(Level.SEVERE, "Ошибка при очистке таблицы пользователей.", ex);
         }
     }
 }
